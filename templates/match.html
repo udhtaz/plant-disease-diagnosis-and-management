@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Match Diseases</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <h1>Match Diseases</h1>
+
+    <form id="symptomForm">
+        <!-- Add checkboxes dynamically based on fetched symptoms -->
+        <ul id="symptomsList"></ul>
+
+        <button type="button" onclick="submitSymptoms()">Submit</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        function fetchSymptoms() {
+            const selectedPlant = document.getElementById('plantDropdown').value;
+
+            // Fetch symptoms for the selected plant from the Flask endpoint
+            fetch(`/plant_symptoms/${selectedPlant}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Plant not found: ${selectedPlant}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const symptomsList = document.getElementById('symptomsList');
+                    symptomsList.innerHTML = ''; // Clear previous content
+
+                    // Function to split sentences while preserving "i.e." and "e.g."
+                    function splitSentences(text) {
+                        const sentences = text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\;)\s/g);
+                        return sentences.map(sentence => sentence.trim());
+                    }
+
+                    // Populate the symptoms as selectable checkboxes
+                    data.plant_symptoms.forEach(symptom => {
+                        // Split sentences and append each sliced sentence as a selectable checkbox
+                        splitSentences(symptom).forEach(sentence => {
+                            const listItem = document.createElement('li');
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.value = sentence;
+                            listItem.appendChild(checkbox);
+                            listItem.appendChild(document.createTextNode(sentence));
+                            symptomsList.appendChild(listItem);
+                        });
+                    });
+
+                    // Add the "Submit" button
+                    const submitButton = document.createElement('button');
+                    submitButton.type = 'button';
+                    submitButton.textContent = 'Submit';
+                    submitButton.onclick = submitSymptoms;  // Call submitSymptoms function on button click
+                    symptomsList.appendChild(submitButton);
+                })
+                .catch(error => console.error('Error fetching symptoms:', error));
+        }
+
+        function submitSymptoms() {
+            const selectedSymptoms = Array.from(document.querySelectorAll('#symptomsList input:checked'))
+                .map(checkbox => checkbox.value);
+
+            // Send selected symptoms to the Flask endpoint
+            fetch('/match_diseases', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ selected_symptoms: selectedSymptoms })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    const resultsDiv = document.getElementById('results');
+                    resultsDiv.innerHTML = ''; // Clear previous content
+
+                    // Display matched diseases
+                    data.matched_diseases.forEach(disease => {
+                        const diseaseDiv = document.createElement('div');
+                        diseaseDiv.innerHTML = `<strong>Disease Name:</strong> ${disease['Disease Name']}<br>`;
+                        diseaseDiv.innerHTML += `<strong>Botanical Name:</strong> ${disease['Botanical Name']}<br>`;
+                        diseaseDiv.innerHTML += `<strong>Symptoms:</strong> ${disease['Symptoms']}<br>`;
+                        diseaseDiv.innerHTML += `<strong>Cause:</strong> ${disease['Cause']}<br>`;
+                        diseaseDiv.innerHTML += `<strong>Comments:</strong> ${disease['Comments']}<br>`;
+                        diseaseDiv.innerHTML += `<strong>Management:</strong> ${disease['Management']}<br>`;
+                        resultsDiv.appendChild(diseaseDiv);
+                    });
+                })
+                .catch(error => console.error('Error matching diseases:', error));
+        }
+    </script>
+</body>
+
+</html>

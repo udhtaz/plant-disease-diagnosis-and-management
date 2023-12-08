@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plant Names Dropdown</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+
+<body>
+    <h1>Crop Disease Diagnosis and Management</h1>
+
+    <form>
+        <label for="plantDropdown">Select a Plant:</label>
+        <select id="plantDropdown"></select>
+        <button type="button" onclick="fetchSymptoms()">Show Symptoms</button>
+    </form>
+
+    <ul id="symptomsList"></ul>
+
+    <script>
+        // Fetch plant names from the Flask endpoint and populate the dropdown
+        fetch('/plant_names')
+            .then(response => response.json())
+            .then(data => {
+                const plantDropdown = document.getElementById('plantDropdown');
+                data.plant_names.forEach(plant => {
+                    const option = document.createElement('option');
+                    option.value = plant;
+                    option.text = plant;
+                    plantDropdown.appendChild(option);
+                });
+            })
+            .catch(error => console.error('Error fetching plant names:', error));
+
+        function fetchSymptoms() {
+            const selectedPlant = document.getElementById('plantDropdown').value;
+
+            // Fetch symptoms for the selected plant from the Flask endpoint
+            fetch(`/plant_symptoms/${selectedPlant}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Plant not found: ${selectedPlant}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const symptomsList = document.getElementById('symptomsList');
+                    symptomsList.innerHTML = ''; // Clear previous content
+
+                    // Function to split sentences while preserving "i.e." and "e.g."
+                    function splitSentences(text) {
+                        const sentences = text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\;)\s/g);
+                        return sentences.map(sentence => sentence.trim());
+                    }
+
+                    // Populate the symptoms as selectable checkboxes
+                    data.plant_symptoms.forEach(symptom => {
+                        // Split sentences and append each sliced sentence as a selectable checkbox
+                        splitSentences(symptom).forEach(sentence => {
+                            const listItem = document.createElement('li');
+                            const checkbox = document.createElement('input');
+                            checkbox.type = 'checkbox';
+                            checkbox.value = sentence;
+                            listItem.appendChild(checkbox);
+                            listItem.appendChild(document.createTextNode(sentence));
+                            symptomsList.appendChild(listItem);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching symptoms:', error));
+        }
+    </script>
+</body>
+
+</html>
