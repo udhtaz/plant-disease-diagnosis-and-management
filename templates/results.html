@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Disease Diagnosis Results</title>
+    <link rel="stylesheet" type="text/css" href="../static/styles.css">
+</head>
+
+<body>
+    <h1>Crop Disease Diagnosis Results</h1>
+
+    <div id="results-page">
+        <div id="results"></div>
+        <a href="/" class="back-link">Back to Diagnosis Page</a>
+    </div>
+
+    <script>
+        // Populate results from the query parameters
+        const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        const matchedDiseases = JSON.parse(decodeURIComponent(urlParams.get('matchedDiseases')));
+
+        // Display matched diseases on the results page
+        const resultsDiv = document.getElementById('results');
+        matchedDiseases.forEach(disease => {
+            const diseaseContainer = document.createElement('div');
+            diseaseContainer.className = 'result-container';
+
+            const diseaseDiv = document.createElement('div');
+            diseaseDiv.className = 'result';
+            diseaseDiv.innerHTML = `<strong>Disease Name:</strong> ${disease['Disease Name']}<br>`;
+            diseaseDiv.innerHTML += `<strong>Botanical Name:</strong> ${disease['Botanical Name']}<br>`;
+            diseaseDiv.innerHTML += `<strong>Symptoms:</strong> ${disease['Symptoms']}<br>`;
+            diseaseDiv.innerHTML += `<strong>Cause:</strong> ${disease['Cause']}<br>`;
+            diseaseDiv.innerHTML += `<strong>Comments:</strong> ${disease['Comments']}<br>`;
+            diseaseDiv.innerHTML += `<strong>Management:</strong> ${disease['Management']}<br>`;
+
+            diseaseContainer.appendChild(diseaseDiv);
+            resultsDiv.appendChild(diseaseContainer);
+        });
+    </script>
+</body>
+
+</html>

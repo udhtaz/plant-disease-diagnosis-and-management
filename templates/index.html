@@ -2,10 +2,10 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Plant Names Dropdown</title>
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Crop Disease Diagnosis and Management</title>
+    <link rel="stylesheet" type="text/css" href="../static/styles.css" />
 </head>
 
 <body>
@@ -14,62 +14,183 @@
     <form>
         <label for="plantDropdown">Select a Plant:</label>
         <select id="plantDropdown"></select>
-        <button type="button" onclick="fetchSymptoms()">Show Symptoms</button>
+        <div class="button-container">
+            <button type="button" onclick="fetchSymptoms()">Show Symptoms</button>
+            <button type="button" onclick="fetchDiseases()">Show Diseases</button>
+        </div>
     </form>
 
-    <ul id="symptomsList"></ul>
+    <div id="symptomsContainer"></div>
+    <div id="diseasesContainer"></div>
+
+    <div id="results"></div>
 
     <script>
         // Fetch plant names from the Flask endpoint and populate the dropdown
-        fetch('/plant_names')
-            .then(response => response.json())
-            .then(data => {
-                const plantDropdown = document.getElementById('plantDropdown');
-                data.plant_names.forEach(plant => {
-                    const option = document.createElement('option');
+        fetch("/plant_names")
+            .then((response) => response.json())
+            .then((data) => {
+                const plantDropdown = document.getElementById("plantDropdown");
+                data.plant_names.forEach((plant) => {
+                    const option = document.createElement("option");
                     option.value = plant;
                     option.text = plant;
                     plantDropdown.appendChild(option);
                 });
             })
-            .catch(error => console.error('Error fetching plant names:', error));
+            .catch((error) => console.error("Error fetching plant names:", error));
 
         function fetchSymptoms() {
-            const selectedPlant = document.getElementById('plantDropdown').value;
+            const selectedPlant = document.getElementById("plantDropdown").value;
 
             // Fetch symptoms for the selected plant from the Flask endpoint
             fetch(`/plant_symptoms/${selectedPlant}`)
-                .then(response => {
+                .then((response) => {
                     if (!response.ok) {
                         throw new Error(`Plant not found: ${selectedPlant}`);
                     }
                     return response.json();
                 })
-                .then(data => {
-                    const symptomsList = document.getElementById('symptomsList');
-                    symptomsList.innerHTML = ''; // Clear previous content
+                .then((data) => {
+                    const symptomsContainer =
+                        document.getElementById("symptomsContainer");
+                    symptomsContainer.innerHTML = ""; // Clear previous content
 
-                    // Function to split sentences while preserving "i.e." and "e.g."
-                    function splitSentences(text) {
-                        const sentences = text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\;)\s/g);
-                        return sentences.map(sentence => sentence.trim());
-                    }
+                    // Create columns to group symptoms
+                    const numColumns = 3; // Adjust the number of columns as needed
+                    const symptomsColumns = Array.from({ length: numColumns }, (_, i) =>
+                        document.createElement("ul")
+                    );
+                    let currentColumnIndex = 0;
 
-                    // Populate the symptoms as selectable checkboxes
-                    data.plant_symptoms.forEach(symptom => {
-                        // Split sentences and append each sliced sentence as a selectable checkbox
-                        splitSentences(symptom).forEach(sentence => {
-                            const listItem = document.createElement('li');
-                            const checkbox = document.createElement('input');
-                            checkbox.type = 'checkbox';
+                    // Populate symptoms as selectable checkboxes
+                    data.plant_symptoms.forEach((symptom) => {
+                        splitSentences(symptom).forEach((sentence) => {
+                            const listItem = document.createElement("li");
+                            const checkbox = document.createElement("input");
+                            checkbox.type = "checkbox";
                             checkbox.value = sentence;
                             listItem.appendChild(checkbox);
                             listItem.appendChild(document.createTextNode(sentence));
-                            symptomsList.appendChild(listItem);
+                            symptomsColumns[currentColumnIndex].appendChild(listItem);
+
+                            // Move to the next column
+                            currentColumnIndex = (currentColumnIndex + 1) % numColumns;
                         });
                     });
+
+                    // Append columns to the container
+                    symptomsColumns.forEach((column, index) => {
+                        const columnDiv = document.createElement("div");
+                        columnDiv.className = "symptom-column";
+                        columnDiv.appendChild(column);
+                        symptomsContainer.appendChild(columnDiv);
+                    });
+
+                    // Add the "Submit" button for symptoms
+                    const submitButton = document.createElement("button");
+                    submitButton.type = "button";
+                    submitButton.textContent = "Submit Symptoms";
+                    submitButton.onclick = submitSelections; // Call submitSelections function on button click
+                    symptomsContainer.appendChild(submitButton);
                 })
-                .catch(error => console.error('Error fetching symptoms:', error));
+                .catch((error) => console.error("Error fetching symptoms:", error));
+        }
+
+        function fetchDiseases() {
+            const selectedPlant = document.getElementById("plantDropdown").value;
+
+            // Fetch diseases for the selected plant from the Flask endpoint
+            fetch(`/plant_diseases/${selectedPlant}`)
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error(`Plant not found: ${selectedPlant}`);
+                    }
+                    return response.json();
+                })
+                .then((data) => {
+                    const diseasesContainer =
+                        document.getElementById("diseasesContainer");
+                    diseasesContainer.innerHTML = ""; // Clear previous content
+
+                    // Create columns to group diseases
+                    const numColumns = 3; // Adjust the number of columns as needed
+                    const diseasesColumns = Array.from({ length: numColumns }, (_, i) =>
+                        document.createElement("ul")
+                    );
+                    let currentColumnIndex = 0;
+
+                    // Populate diseases as selectable checkboxes
+                    data.plant_diseases.forEach((disease) => {
+                        splitSentences(disease).forEach((sentence) => {
+                            const listItem = document.createElement("li");
+                            const checkbox = document.createElement("input");
+                            checkbox.type = "checkbox";
+                            checkbox.value = sentence;
+                            listItem.appendChild(checkbox);
+                            listItem.appendChild(document.createTextNode(sentence));
+                            diseasesColumns[currentColumnIndex].appendChild(listItem);
+
+                            // Move to the next column
+                            currentColumnIndex = (currentColumnIndex + 1) % numColumns;
+                        });
+                    });
+
+                    // Append columns to the container
+                    diseasesColumns.forEach((column, index) => {
+                        const columnDiv = document.createElement("div");
+                        columnDiv.className = "disease-column";
+                        columnDiv.appendChild(column);
+                        diseasesContainer.appendChild(columnDiv);
+                    });
+
+                    // Add the "Submit" button for diseases
+                    const submitButton = document.createElement("button");
+                    submitButton.type = "button";
+                    submitButton.textContent = "Submit Diseases";
+                    submitButton.onclick = submitSelections; // Call submitSelections function on button click
+                    diseasesContainer.appendChild(submitButton);
+                })
+                .catch((error) => console.error("Error fetching diseases:", error));
+        }
+
+        function submitSelections() {
+            // Your existing submitSymptoms function
+            const selectedSymptoms = Array.from(
+                document.querySelectorAll(".symptom-column input:checked")
+            ).map((checkbox) => checkbox.value);
+            const selectedDiseases = Array.from(
+                document.querySelectorAll(".disease-column input:checked")
+            ).map((checkbox) => checkbox.value);
+
+            // Send selected symptoms and diseases to the Flask endpoint
+            fetch("/match_selections", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    selected_symptoms: selectedSymptoms,
+                    selected_diseases: selectedDiseases,
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    // Redirect to the results page
+                    window.location.href = `/results?matchedDiseases=${encodeURIComponent(
+                        JSON.stringify(data.matched_diseases)
+                    )}`;
+                })
+                .catch((error) =>
+                    console.error("Error matching symptoms and diseases:", error)
+                );
+        }
+
+        function splitSentences(text) {
+            const sentences = text.split(
+                /(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\;)\s/g
+            );
+            return sentences.map((sentence) => sentence.trim());
         }
     </script>
 </body>

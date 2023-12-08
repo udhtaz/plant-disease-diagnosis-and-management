@@ -171,6 +171,21 @@ def get_plant_symptoms(plant):
     return jsonify({'plant_symptoms': plant_symptoms})
 
 
+# Endpoint to get diseases for a selected plant
+@app.route('/plant_diseases/<plant>', methods=['GET'])
+def get_plant_diseases(plant):
+    # Ensure the plant name is lowercase to match the sheet names
+    plant = plant.lower()
+
+    if plant not in plant_dataframes:
+        return jsonify({'error': f'Plant "{plant}" not found'}), 404
+
+    # Retrieve symptoms for the selected plant
+    plant_diseases = plant_dataframes[plant]['Disease Name'].tolist()
+
+    return jsonify({'plant_diseases': plant_diseases})
+
+
 # Endpoint to process selected symptoms and match with diseases
 @app.route('/match_diseases', methods=['POST'])
 def match_diseases():
@@ -185,7 +200,8 @@ def match_diseases():
     for plant, df in plant_dataframes.items():
         # Iterate over each row in the DataFrame
         for index, row in df.iterrows():
-            symptoms = row['Symptoms']
+            # Convert symptoms to string to handle potential floats
+            symptoms = str(row['Symptoms'])
             disease_name = row['Disease Name']
 
             # Check if any selected symptom matches with the symptoms of the disease
@@ -199,14 +215,49 @@ def match_diseases():
                     'Management': row['Management']
                 }
                 matched_diseases.append(matched_disease)
+                print('matched_diseases', matched_diseases)
 
     return jsonify({'matched_diseases': matched_diseases})
 
 
+# Endpoint to match either symptom or disease
+@app.route('/match_selections', methods=['POST'])
+def match_selections():
+    selected_symptoms = request.json.get('selected_symptoms', [])
+    selected_diseases = request.json.get('selected_diseases', [])
+
+    if not selected_symptoms and not selected_diseases:
+        return jsonify({'error': 'No symptoms or diseases selected'}), 400
+
+    matched_diseases = []
+
+    # Iterate over each plant's DataFrame
+    for plant, df in plant_dataframes.items():
+        # Iterate over each row in the DataFrame
+        for index, row in df.iterrows():
+            # Convert symptoms and diseases to strings to handle potential floats
+            symptoms = str(row['Symptoms'])
+            diseases = str(row['Disease Name'])
+
+            # Check if any selected symptom or disease matches with the symptoms or diseases of the plant
+            if any(symptom.lower() in symptoms.lower() for symptom in selected_symptoms) or \
+                    any(disease.lower() in diseases.lower() for disease in selected_diseases):
+                matched_disease = {
+                    'Disease Name': diseases,
+                    'Botanical Name': row['Botanical Name'],
+                    'Symptoms': symptoms,
+                    'Cause': row['Cause'],
+                    'Comments': row['Comments'],
+                    'Management': row['Management']
+                }
+                matched_diseases.append(matched_disease)
+
+    return jsonify({'matched_diseases': matched_diseases})
+
 # Add this route to your Flask application
-@app.route('/match')
-def match():
-    return render_template('match.html')
+@app.route('/results')
+def results():
+    return render_template('results.html')
 
 
 if __name__ == '__main__':
