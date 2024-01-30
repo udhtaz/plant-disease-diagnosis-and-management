@@ -36,21 +36,6 @@ def load_data_from_excel():
 plant_dataframes = load_data_from_excel()
 
 
-# # Function to load data from Excel file and generate DataFrame for each plant
-# def load_data_from_excel():
-#     plant_dataframes = {}
-    
-#     # Read the Excel file into a dictionary of DataFrames
-#     xls = pd.ExcelFile(excel_file_path)
-#     for sheet_name in xls.sheet_names:
-#         df = xls.parse(sheet_name)
-#         plant_dataframes[sheet_name.lower()] = df
-    
-#     return plant_dataframes
-
-# # Load data from Excel file on application startup
-# plant_dataframes = load_data_from_excel()
-
 # Function to extract data from URLs and generate Excel file
 def generate_excel():
 

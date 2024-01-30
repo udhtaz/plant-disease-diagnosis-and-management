@@ -1,4 +1,9 @@
 /* style.css */
+
+label[for="plantDropdown"] {
+    color: black;
+}
+
 body {
     background: linear-gradient(to right, #3498db, #2ecc71);
     /* Gradient background */
@@ -31,8 +36,8 @@ button {
     padding: 10px 20px;
     font-size: 16px;
     cursor: pointer;
-    border: none;
-    border-radius: 5px;
+    border: solid;
+    border-radius: 10px;
     transition: background-color 0.3s ease;
     /* Smooth color transition */
 }
@@ -41,7 +46,7 @@ button {
     display: flex;
     justify-content: space-around;
     /* Adjust as needed */
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
 button:hover {
@@ -51,7 +56,9 @@ button:hover {
 #symptomsContainer {
     text-align: left;
     margin: 20px auto;
-    max-width: 600px;
+    /* text-align: left;
+    margin: 20px auto; */
+    max-width: 90%;
     /* Adjust the maximum width of the symptoms container */
 }
 
@@ -90,8 +97,8 @@ li {
     display: block;
     text-align: center;
     padding: 10px 20px;
-    background-color: #4CAF50;
-    color: white;
+    background-color: white;
+    color: greenyellow;
     text-decoration: none;
     border-radius: 5px;
     margin: 20px auto;
@@ -99,12 +106,12 @@ li {
 }
 
 .back-link:hover {
-    background-color: #45a049;
+    background-color: gray;
 }
 
 /* Add this style for the disease container */
 #diseasesContainer {
-    text-align: center;
+    text-align: left;
     margin: 20px;
 }
 
@@ -128,3 +135,10 @@ li {
 #results-page a:hover {
     color: #45a049;
 }
+
+/* .clickable-disease-name {
+    cursor: pointer;
+    color: blue;
+    
+    text-decoration: underline;
+} */

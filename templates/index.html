@@ -41,6 +41,12 @@
             .catch((error) => console.error("Error fetching plant names:", error));
 
         function fetchSymptoms() {
+            const symptomsContainer = document.getElementById("symptomsContainer");
+            const diseasesContainer = document.getElementById("diseasesContainer");
+
+            symptomsContainer.style.display = "block";
+            diseasesContainer.style.display = "none";
+
             const selectedPlant = document.getElementById("plantDropdown").value;
 
             // Fetch symptoms for the selected plant from the Flask endpoint
@@ -90,7 +96,7 @@
                     // Add the "Submit" button for symptoms
                     const submitButton = document.createElement("button");
                     submitButton.type = "button";
-                    submitButton.textContent = "Submit Symptoms";
+                    submitButton.textContent = "Diagnose";
                     submitButton.onclick = submitSelections; // Call submitSelections function on button click
                     symptomsContainer.appendChild(submitButton);
                 })
@@ -98,6 +104,12 @@
         }
 
         function fetchDiseases() {
+            const symptomsContainer = document.getElementById("symptomsContainer");
+            const diseasesContainer = document.getElementById("diseasesContainer");
+
+            symptomsContainer.style.display = "none";
+            diseasesContainer.style.display = "block";
+
             const selectedPlant = document.getElementById("plantDropdown").value;
 
             // Fetch diseases for the selected plant from the Flask endpoint

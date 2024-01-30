@@ -13,8 +13,27 @@
 
     <div id="results-page">
         <div id="results"></div>
-        <a href="/" class="back-link">Back to Diagnosis Page</a>
+        <button id="backToDiagnosisButton" class="back-link">Back to Diagnosis Page</button>
+        <button id="managementButton" class="back-link" style="display: none;">Management and Control</button>
     </div>
+
+    <style>
+        .clickable-disease-name {
+            display: inline-block;
+            cursor: pointer;
+            color: blue;
+            text-decoration: underline;
+            margin-right: 5px;
+
+        }
+
+        .disease-checkbox {
+            display: inline-block;
+            cursor: pointer;
+            margin-right: 10px;
+            /* Adjust the margin as needed */
+        }
+    </style>
 
     <script>
         // Populate results from the query parameters
@@ -24,21 +43,148 @@
 
         // Display matched diseases on the results page
         const resultsDiv = document.getElementById('results');
+        const managementButton = document.getElementById('managementButton');
+        const backToDiagnosisButton = document.getElementById('backToDiagnosisButton');
+
         matchedDiseases.forEach(disease => {
             const diseaseContainer = document.createElement('div');
             diseaseContainer.className = 'result-container';
 
             const diseaseDiv = document.createElement('div');
             diseaseDiv.className = 'result';
-            diseaseDiv.innerHTML = `<strong>Disease Name:</strong> ${disease['Disease Name']}<br>`;
-            diseaseDiv.innerHTML += `<strong>Botanical Name:</strong> ${disease['Botanical Name']}<br>`;
-            diseaseDiv.innerHTML += `<strong>Symptoms:</strong> ${disease['Symptoms']}<br>`;
-            diseaseDiv.innerHTML += `<strong>Cause:</strong> ${disease['Cause']}<br>`;
-            diseaseDiv.innerHTML += `<strong>Comments:</strong> ${disease['Comments']}<br>`;
-            diseaseDiv.innerHTML += `<strong>Management:</strong> ${disease['Management']}<br>`;
+
+            // Add a checkbox beside the disease name
+            const diseaseCheckbox = document.createElement('input');
+            diseaseCheckbox.type = 'checkbox';
+            diseaseCheckbox.className = 'disease-checkbox';
+            diseaseDiv.appendChild(diseaseCheckbox);
+
+            // Make the disease name clickable
+            const clickableDiseaseName = document.createElement('span');
+            clickableDiseaseName.className = 'clickable-disease-name';
+            clickableDiseaseName.textContent = disease['Disease Name'];
+            clickableDiseaseName.addEventListener('click', function () {
+                handleDiseaseNameClick(disease['Disease Name']);
+            });
+            diseaseDiv.appendChild(clickableDiseaseName);
+
+            // Function to check if a property has a value
+            const addPropertyToDisplay = (propertyName, label) => {
+                if (disease[propertyName] !== undefined && disease[propertyName] !== null) {
+                    if (propertyName !== 'Disease Name') {
+                        diseaseDiv.innerHTML += `<strong>${label}:</strong> ${disease[propertyName]}<br>`;
+                    }
+                }
+
+                // If the Management property is either undefined or an empty string, display the Management and Control button
+                if (propertyName === 'Management' && (disease[propertyName] === undefined || disease[propertyName].trim() === '')) {
+                    managementButton.style.display = 'block';
+                    // Attach the disease name to the button
+                    managementButton.dataset.clickedDiseaseName = disease['Disease Name'];
+                } else {
+                    managementButton.style.display = 'none';
+                }
+            };
+            addPropertyToDisplay('Disease Name', 'Disease Name');
+            addPropertyToDisplay('Botanical Name', 'Botanical Name');
+            addPropertyToDisplay('Symptoms', 'Symptoms');
+            addPropertyToDisplay('Cause', 'Cause');
+            addPropertyToDisplay('Comments', 'Comments');
+            addPropertyToDisplay('Management', 'Management');
 
             diseaseContainer.appendChild(diseaseDiv);
             resultsDiv.appendChild(diseaseContainer);
+        });
+
+        // Handle the click of the "Management and Control" button
+        managementButton.addEventListener('click', function () {
+            // Access the clicked disease name from the dataset attribute
+            const clickedDiseaseName = managementButton.dataset.clickedDiseaseName;
+
+            // Send the clicked disease name to the "/match_management" route
+            fetch("/match_management", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    selected_diseases: [clickedDiseaseName],
+                }),
+            })
+                .then((response) => response.json())
+                .then((data) => {
+                    // Update the results on the page based on the response
+                    updateResults(data.matched_diseases);
+                })
+                .catch((error) => console.error("Error matching management:", error));
+        });
+
+        // Function to update the results on the page
+        function updateResults(matchedDiseases) {
+            // Clear existing results
+            resultsDiv.innerHTML = '';
+
+            // Display the matched diseases on the page
+            matchedDiseases.forEach(disease => {
+                const diseaseContainer = document.createElement('div');
+                diseaseContainer.className = 'result-container';
+
+                const diseaseDiv = document.createElement('div');
+                diseaseDiv.className = 'result';
+
+                // Function to check if a property has a value
+                const addPropertyToDisplay = (propertyName, label) => {
+                    if (disease[propertyName] !== undefined && disease[propertyName] !== null) {
+                        diseaseDiv.innerHTML += `<strong>${label}:</strong> ${disease[propertyName]}<br>`;
+                    }
+
+                    // If the Management property is either undefined or an empty string, display the Management and Control button
+                    if (propertyName === 'Management' && (disease[propertyName] === undefined || disease[propertyName].trim() === '')) {
+                        managementButton.style.display = 'block';
+                        // Attach the disease name to the button
+                        managementButton.dataset.clickedDiseaseName = disease['Disease Name'];
+                    } else {
+                        managementButton.style.display = 'none';
+                    }
+                };
+
+
+
+                // Add a checkbox beside the disease name in the updated results
+                const diseaseCheckbox = document.createElement('input');
+                diseaseCheckbox.type = 'checkbox';
+                diseaseCheckbox.className = 'disease-checkbox';
+                diseaseDiv.appendChild(diseaseCheckbox);
+
+                // Make the disease name clickable in the updated results
+                const clickableDiseaseName = document.createElement('span');
+                clickableDiseaseName.className = 'clickable-disease-name';
+                clickableDiseaseName.textContent = disease['Disease Name'];
+                clickableDiseaseName.addEventListener('click', function () {
+                    handleDiseaseNameClick(disease['Disease Name']);
+                });
+                diseaseDiv.appendChild(clickableDiseaseName);
+
+                addPropertyToDisplay('Disease Name', 'Disease Name');
+                addPropertyToDisplay('Botanical Name', 'Botanical Name');
+                addPropertyToDisplay('Symptoms', 'Symptoms');
+                addPropertyToDisplay('Cause', 'Cause');
+                addPropertyToDisplay('Comments', 'Comments');
+                addPropertyToDisplay('Management', 'Management');
+
+                diseaseContainer.appendChild(diseaseDiv);
+                resultsDiv.appendChild(diseaseContainer);
+            });
+        }
+
+        // Handle the click of the disease name
+        function handleDiseaseNameClick(clickedDiseaseName) {
+            alert(`Clicked Disease Name: ${clickedDiseaseName}`);
+        }
+
+        // Redirect to the diagnosis page when the back to diagnosis button is clicked
+        backToDiagnosisButton.addEventListener('click', function () {
+            window.location.href = '/';
         });
     </script>
 </body>
