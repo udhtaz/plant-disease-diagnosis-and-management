@@ -2,7 +2,7 @@
 
 ## Overview
 
-This Flask web application provides a platform for diagnosing plant diseases based on user-provided symptoms. The system uses OpenAI's GPT-3 for symptom matching and extracts disease information from plant disease datasets available on PlantVillage.
+This Flask web application provides a platform for diagnosing plant diseases based on user-provided symptoms. The system uses diagnostic information of plant disease available on PlantVillage.
 
 ## Features
 
@@ -10,7 +10,7 @@ This Flask web application provides a platform for diagnosing plant diseases bas
 
 - **Excel Sheet Generation:** The application scrapes plant disease information from PlantVillage URLs, organizes the data into a structured format, and generates an Excel sheet containing disease information for different plants.
 
-- **Download Excel:** Knowledge Base Engineer can generate the Excel file containing plant disease information into the expert system
+- **Generate Knowledge Base in Excel Format:** Knowledge Base Engineer can generate the Excel file containing plant disease information into the expert system.
 
 Usage
 1. Clone the repository:
@@ -31,12 +31,12 @@ Usage
 
     ```bash
     pip install -r requirements.txt
-4. Run the application:
+5. Run the application:
     python app.py
 
 The application will be accessible at http://127.0.0.1:5000/ in your web browser.
 
-5. *Regenerate the plant_disease excel sheet (this endpoint should be accessible to only the knowledge / backend engineer)
+6. *Regenerate the plant_disease excel sheet (this endpoint should be accessible to only the knowledge / backend engineer)
     run a GET request on the endpoint: http://127.0.0.1:5000/save_excel
 
 ## Acknowledgments
