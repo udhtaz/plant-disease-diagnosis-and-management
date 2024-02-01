@@ -51,7 +51,7 @@ def generate_excel():
     plant_dataframes = {}
 
     for plant, url in urls.items():
-        print("=" * 10, plant, "=" * 10)
+        print("=" * 10, "Generating Knowledge Base for", plant, "=" * 10)
 
         try:
             res = session.get(url)
@@ -86,7 +86,7 @@ def generate_excel():
 
                 # Skip if the disease name has already been encountered for this plant
                 if disease_name in encountered_diseases:
-                    print(f"Skipping duplicate disease name ({disease_name}) for {plant}.")
+                    # print(f"Skipping duplicate disease name ({disease_name}) for {plant}.")
                     continue
 
                 # Append data to lists
@@ -101,7 +101,7 @@ def generate_excel():
                 encountered_diseases.add(disease_name)
 
             except AttributeError as e:
-                print(f"Error: {e}. Skipping to the next iteration.")
+                # print(f"Error: {e}. Skipping to the next iteration.")
                 continue
 
         # Create a DataFrame for the current plant

@@ -6,6 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crop Disease Diagnosis and Management</title>
     <link rel="stylesheet" type="text/css" href="../static/styles.css" />
+    <style>
+
+    </style>
 </head>
 
 <body>
@@ -20,8 +23,11 @@
         </div>
     </form>
 
-    <div id="symptomsContainer"></div>
-    <div id="diseasesContainer"></div>
+    <div id="symptomsContainer" class="scrollable-container"></div>
+    <div id="diseasesContainer" class="scrollable-container"></div>
+
+    <button type="button" id="diagnoseButton" style="display: none;">Diagnose</button>
+    <button type="button" id="submitDiseasesButton" style="display: none;">Submit Diseases</button>
 
     <div id="results"></div>
 
@@ -93,12 +99,10 @@
                         symptomsContainer.appendChild(columnDiv);
                     });
 
-                    // Add the "Submit" button for symptoms
-                    const submitButton = document.createElement("button");
-                    submitButton.type = "button";
-                    submitButton.textContent = "Diagnose";
-                    submitButton.onclick = submitSelections; // Call submitSelections function on button click
-                    symptomsContainer.appendChild(submitButton);
+                    // Show the "Diagnose" button
+                    document.getElementById("diagnoseButton").style.display = "block";
+                    // Hide the "Submit Diseases" button
+                    document.getElementById("submitDiseasesButton").style.display = "none";
                 })
                 .catch((error) => console.error("Error fetching symptoms:", error));
         }
@@ -156,18 +160,15 @@
                         diseasesContainer.appendChild(columnDiv);
                     });
 
-                    // Add the "Submit" button for diseases
-                    const submitButton = document.createElement("button");
-                    submitButton.type = "button";
-                    submitButton.textContent = "Submit Diseases";
-                    submitButton.onclick = submitSelections; // Call submitSelections function on button click
-                    diseasesContainer.appendChild(submitButton);
+                    // Hide the "Diagnose" button
+                    document.getElementById("diagnoseButton").style.display = "none";
+                    // Show the "Submit Diseases" button
+                    document.getElementById("submitDiseasesButton").style.display = "block";
                 })
                 .catch((error) => console.error("Error fetching diseases:", error));
         }
 
         function submitSelections() {
-            // Your existing submitSymptoms function
             const selectedSymptoms = Array.from(
                 document.querySelectorAll(".symptom-column input:checked")
             ).map((checkbox) => checkbox.value);
@@ -186,7 +187,12 @@
                     selected_diseases: selectedDiseases,
                 }),
             })
-                .then((response) => response.json())
+                .then((response) => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
                 .then((data) => {
                     // Redirect to the results page
                     window.location.href = `/results?matchedDiseases=${encodeURIComponent(
@@ -197,6 +203,13 @@
                     console.error("Error matching symptoms and diseases:", error)
                 );
         }
+
+
+        // Button for diagnosing symptoms and submitting diseases
+        document.getElementById("diagnoseButton").addEventListener("click", submitSelections);
+        document.getElementById("submitDiseasesButton").addEventListener("click", submitSelections);
+
+
 
         function splitSentences(text) {
             const sentences = text.split(
