@@ -1,4 +1,4 @@
-# Plant Disease Diagnosis Web App
+# Crop Disease Diagnosis and Management Web App
 
 ## Overview
 
@@ -6,39 +6,38 @@ This Flask web application provides a platform for diagnosing plant diseases bas
 
 ## Features
 
-- **Disease Diagnosis:** Users can input the name of a plant and the observed symptoms, and the system will provide a diagnosis based on the available plant disease data.
+- **Disease Diagnosis:** Users can select the name of a plant and/or the observed symptoms, and the system will provide a diagnosis based on the available plant disease data.
 
 - **Excel Sheet Generation:** The application scrapes plant disease information from PlantVillage URLs, organizes the data into a structured format, and generates an Excel sheet containing disease information for different plants.
 
-- **Download Excel:** Users can download the generated Excel file containing plant disease information.
-
-## Requirements
-
-Make sure you have the following libraries installed before running the application:
-
-Flask==2.0.1
-requests==2.26.0
-beautifulsoup4==4.10.0
-pandas==1.3.3
-openpyxl==3.0.16
-
-```bash
-pip install -r requirements.txt
+- **Download Excel:** Knowledge Base Engineer can generate the Excel file containing plant disease information into the expert system
 
 Usage
 1. Clone the repository:
     git clone https://github.com/udhtaz/plant-disease-diagnosis-and-management.git
 2. Navigate to the project directory:
-    cd cd plant-disease-diagnosis
+    cd plant-disease-diagnosis
+3. Create a virtual environment 
+    python -m venv /environmentname
+4. ## Requirements
+
+    Make sure you have the following libraries installed before running the application:
+
+    Flask==2.0.1
+    requests==2.26.0
+    beautifulsoup4==4.10.0
+    pandas==1.3.3
+    openpyxl==3.0.16
+
+    ```bash
+    pip install -r requirements.txt
 4. Run the application:
     python app.py
 
 The application will be accessible at http://127.0.0.1:5000/ in your web browser.
 
-
-
-
-
+5. *Regenerate the plant_disease excel sheet (this endpoint should be accessible to only the knowledge / backend engineer)
+    run a GET request on the endpoint: http://127.0.0.1:5000/save_excel
 
 ## Acknowledgments
 PlantVillage for the plant disease datasets.

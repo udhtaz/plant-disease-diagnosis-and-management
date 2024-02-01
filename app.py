@@ -10,13 +10,21 @@ app = Flask(__name__)
 # Define the URLs for different plants
 urls = {
     "beans": "https://plantvillage.psu.edu/topics/bean/infos#diseases",
-    "cassava": "https://plantvillage.psu.edu/topics/cassava-manioc/infos#diseases",
     "mango": "https://plantvillage.psu.edu/topics/mango/infos#diseases",
     "cocoa": "https://plantvillage.psu.edu/topics/cocoa-cacao/infos#diseases",
-    "maize": "https://plantvillage.psu.edu/topics/corn-maize/infos",
     "okra": "https://plantvillage.psu.edu/topics/okra/infos#diseases",
     "oil palm": "https://plantvillage.psu.edu/topics/oil-palm/infos#diseases",
-    "onion": "https://plantvillage.psu.edu/topics/onion/infos#diseases"
+    "onion": "https://plantvillage.psu.edu/topics/onion/infos#diseases",
+    "almond": "https://plantvillage.psu.edu/topics/almond/infos#diseases",
+    "banana": "https://plantvillage.psu.edu/topics/banana/infos#diseases",
+    "carrot": "https://plantvillage.psu.edu/topics/carrot/infos#diseases",
+    "cassava": "https://plantvillage.psu.edu/topics/cassava-manioc/infos#diseases",
+    "cucumber": "https://plantvillage.psu.edu/topics/cucumber/infos#diseases",
+    "ginger": "https://plantvillage.psu.edu/topics/ginger/infos#diseases",
+    "orange": "https://plantvillage.psu.edu/topics/orange/infos#diseases",
+    "pawpaw": "https://plantvillage.psu.edu/topics/papaya-pawpaw/infos#diseases",
+    "plantain": "https://plantvillage.psu.edu/topics/plantain/infos#diseases",
+    "rice": "https://plantvillage.psu.edu/topics/rice/infos#diseases"
 }
 
 # Get the current working directory
