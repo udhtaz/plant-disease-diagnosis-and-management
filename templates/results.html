@@ -13,8 +13,10 @@
 
     <div id="results-page">
         <div id="results"></div>
-        <button id="backToDiagnosisButton" class="back-link">Back to Diagnosis Page</button>
-        <button id="managementButton" class="back-link" style="display: none;">Management and Control</button>
+        <div class="button-container">
+            <button id="backToDiagnosisButton" class="back-link">Back to Diagnosis Page</button>
+            <button id="managementButton" class="back-link" style="display: none;">Management and Control</button>
+        </div>
     </div>
 
     <style>
@@ -42,12 +44,6 @@
             const diseaseDiv = document.createElement('div');
             diseaseDiv.className = 'result';
 
-            // Add a checkbox beside the disease name
-            const diseaseCheckbox = document.createElement('input');
-            diseaseCheckbox.type = 'checkbox';
-            diseaseCheckbox.className = 'disease-checkbox';
-            diseaseDiv.appendChild(diseaseCheckbox);
-
             // Display the disease name as normal text
             diseaseDiv.innerHTML += `<strong>Disease Name:</strong> ${disease['Disease Name']}<br>`;
 
@@ -67,6 +63,7 @@
                 }
             };
 
+            addPropertyToDisplay('Affected Crop', 'Affected Crop');
             addPropertyToDisplay('Botanical Name', 'Botanical Name');
             addPropertyToDisplay('Symptoms', 'Symptoms');
             addPropertyToDisplay('Cause', 'Cause');
@@ -113,14 +110,24 @@
                 const diseaseDiv = document.createElement('div');
                 diseaseDiv.className = 'result';
 
-                // Add a checkbox beside the disease name in the updated results
-                const diseaseCheckbox = document.createElement('input');
-                diseaseCheckbox.type = 'checkbox';
-                diseaseCheckbox.className = 'disease-checkbox';
-                diseaseDiv.appendChild(diseaseCheckbox);
-
-                // Display the disease name as normal text in the updated results
+                // Display the disease name as normal text
                 diseaseDiv.innerHTML += `<strong>Disease Name:</strong> ${disease['Disease Name']}<br>`;
+
+                // Function to check if a property has a value
+                const addPropertyToDisplay = (propertyName, label) => {
+                    if (disease[propertyName] !== undefined && disease[propertyName] !== null) {
+                        diseaseDiv.innerHTML += `<strong>${label}:</strong> ${disease[propertyName]}<br>`;
+                    }
+
+                    // If the Management property is either undefined or an empty string, display the Management and Control button
+                    if (propertyName === 'Management' && (disease[propertyName] === undefined || disease[propertyName].trim() === '')) {
+                        managementButton.style.display = 'block';
+                        // Attach the disease name to the button
+                        managementButton.dataset.clickedDiseaseName = disease['Disease Name'];
+                    } else {
+                        managementButton.style.display = 'none';
+                    }
+                };
 
                 addPropertyToDisplay('Botanical Name', 'Botanical Name');
                 addPropertyToDisplay('Symptoms', 'Symptoms');

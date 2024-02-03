@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Crop Disease Diagnosis and Management</title>
     <link rel="stylesheet" type="text/css" href="../static/styles.css" />
-    <style>
-
-    </style>
+    <style></style>
 </head>
 
 <body>
@@ -26,12 +24,14 @@
     <div id="symptomsContainer" class="scrollable-container"></div>
     <div id="diseasesContainer" class="scrollable-container"></div>
 
-    <button type="button" id="diagnoseButton" style="display: none;">Diagnose</button>
-    <button type="button" id="submitDiseasesButton" style="display: none;">Submit Diseases</button>
+    <button type="button" id="diagnoseButton" style="display: none" class="diagnoseButton">Diagnose</button>
+    <button type="button" id="submitDiseasesButton" style="display: none" class="diagnoseButton">Submit
+        Diseases</button>
 
     <div id="results"></div>
 
     <script>
+        let selectedPlantName;
         // Fetch plant names from the Flask endpoint and populate the dropdown
         fetch("/plant_names")
             .then((response) => response.json())
@@ -53,23 +53,24 @@
             symptomsContainer.style.display = "block";
             diseasesContainer.style.display = "none";
 
-            const selectedPlant = document.getElementById("plantDropdown").value;
+            // Do not re-declare selectedPlantName here
+            selectedPlantName = document.getElementById("plantDropdown").value;
 
             // Fetch symptoms for the selected plant from the Flask endpoint
-            fetch(`/plant_symptoms/${selectedPlant}`)
+            fetch(`/plant_symptoms/${selectedPlantName}`)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(`Plant not found: ${selectedPlant}`);
+                        throw new Error(`Plant not found: ${selectedPlantName}`);
                     }
                     return response.json();
                 })
                 .then((data) => {
                     const symptomsContainer =
                         document.getElementById("symptomsContainer");
-                    symptomsContainer.innerHTML = ""; // Clear previous content
+                    symptomsContainer.innerHTML = "";
 
                     // Create columns to group symptoms
-                    const numColumns = 3; // Adjust the number of columns as needed
+                    const numColumns = 2;
                     const symptomsColumns = Array.from({ length: numColumns }, (_, i) =>
                         document.createElement("ul")
                     );
@@ -85,6 +86,7 @@
                             listItem.appendChild(checkbox);
                             listItem.appendChild(document.createTextNode(sentence));
                             symptomsColumns[currentColumnIndex].appendChild(listItem);
+
 
                             // Move to the next column
                             currentColumnIndex = (currentColumnIndex + 1) % numColumns;
@@ -114,23 +116,23 @@
             symptomsContainer.style.display = "none";
             diseasesContainer.style.display = "block";
 
-            const selectedPlant = document.getElementById("plantDropdown").value;
+            selectedPlantName = document.getElementById("plantDropdown").value;
 
             // Fetch diseases for the selected plant from the Flask endpoint
-            fetch(`/plant_diseases/${selectedPlant}`)
+            fetch(`/plant_diseases/${selectedPlantName}`)
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error(`Plant not found: ${selectedPlant}`);
+                        throw new Error(`Plant not found: ${selectedPlantName}`);
                     }
                     return response.json();
                 })
                 .then((data) => {
                     const diseasesContainer =
                         document.getElementById("diseasesContainer");
-                    diseasesContainer.innerHTML = ""; // Clear previous content
+                    diseasesContainer.innerHTML = "";
 
                     // Create columns to group diseases
-                    const numColumns = 3; // Adjust the number of columns as needed
+                    const numColumns = 2; // Adjust the number of columns as needed
                     const diseasesColumns = Array.from({ length: numColumns }, (_, i) =>
                         document.createElement("ul")
                     );
@@ -169,6 +171,9 @@
         }
 
         function submitSelections() {
+            // Use the selectedPlantName variable here
+            const plantName = selectedPlantName;
+            console.log("plantName", plantName);
             const selectedSymptoms = Array.from(
                 document.querySelectorAll(".symptom-column input:checked")
             ).map((checkbox) => checkbox.value);
@@ -177,7 +182,7 @@
             ).map((checkbox) => checkbox.value);
 
             // Send selected symptoms and diseases to the Flask endpoint
-            fetch("/match_selections", {
+            fetch(`/match_selections/${plantName}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -189,7 +194,7 @@
             })
                 .then((response) => {
                     if (!response.ok) {
-                        throw new Error('Network response was not ok');
+                        throw new Error("Network response was not ok");
                     }
                     return response.json();
                 })
@@ -204,12 +209,9 @@
                 );
         }
 
-
         // Button for diagnosing symptoms and submitting diseases
         document.getElementById("diagnoseButton").addEventListener("click", submitSelections);
         document.getElementById("submitDiseasesButton").addEventListener("click", submitSelections);
-
-
 
         function splitSentences(text) {
             const sentences = text.split(

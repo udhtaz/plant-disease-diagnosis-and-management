@@ -5,11 +5,15 @@ label[for="plantDropdown"] {
 }
 
 body {
-    background: linear-gradient(to right, #3498db, #2ecc71);
-    /* Gradient background */
-    color: #ffffff;
-    font-family: 'Arial', sans-serif;
+    background-image: url("/static/plant_background_1.jpg");
+    background-size: cover;
+    background-position: center;
     margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    color: #f5f5dc;
+    height: 100vh;
+    overflow: hidden;
 }
 
 h1 {
@@ -20,14 +24,10 @@ form {
     text-align: center;
     margin: 20px auto;
     max-width: 400px;
-    /* Adjust the maximum width of the form */
     padding: 20px;
     background-color: rgba(255, 255, 255, 0.8);
-    /* Semi-transparent white background */
     border-radius: 10px;
-    /* Rounded corners */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-    /* Drop shadow */
 }
 
 button {
@@ -40,14 +40,24 @@ button {
     border-radius: 10px;
     transition: background-color 0.3s ease;
     margin-top: 10px;
-    /* Smooth color transition */
 }
 
 .button-container {
     display: flex;
-    justify-content: space-around;
-    /* Adjust as needed */
-    margin-bottom: 10px;
+    justify-content: center;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.diagnoseButton {
+    display: block;
+    text-align: center;
+    padding: 10px 20px;
+    background-color: #2ecc71;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    margin: 20px auto;
 }
 
 button:hover {
@@ -57,42 +67,49 @@ button:hover {
 #symptomsContainer {
     text-align: left;
     margin: 20px auto;
-    /* text-align: left;
-    margin: 20px auto; */
-    max-width: 90%;
-    /* Adjust the maximum width of the symptoms container */
+    max-width: 80%;
 }
 
 .scrollable-container {
-    max-height: 500px;
+    max-height: 580px;
     overflow-y: auto;
-    border: 1px solid #ccc;
+    border: 3px solid #ccc;
     padding: 10px;
     margin-bottom: 10px;
+    display: none;
 }
 
 
 .symptom-column,
 .disease-column {
-    width: calc(100% / 3 - 10px);
+    width: calc(100% / 2 - 10px);
     float: left;
     margin-right: 10px;
 }
 
-.symptom-column li,
-.disease-column li {
-    margin-bottom: 5px;
+.symptom-column li {
+    display: flex;
+    align-items: start;
+    margin-bottom: 10px;
+    font-size: 18px;
 }
 
-/* .button-container {
-    margin-top: 10px;
-} */
-/* .symptom-column {
-    width: 30%;
-    margin: 10px;
-    display: inline-block;
-    vertical-align: top;
-} */
+.symptom-column li input[type="checkbox"] {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.disease-column li {
+    display: flex;
+    align-items: start;
+    margin-bottom: 10px;
+    font-size: 18px;
+}
+
+.disease-column li input[type="checkbox"] {
+    margin-right: 10px;
+    flex-shrink: 0;
+}
 
 ul {
     list-style: none;
@@ -122,31 +139,23 @@ li {
     display: block;
     text-align: center;
     padding: 10px 20px;
-    background-color: white;
+    background-color: gray;
     color: greenyellow;
     text-decoration: none;
     border-radius: 5px;
     margin: 20px auto;
-    /* Center the link and add margin */
 }
 
 .back-link:hover {
-    background-color: gray;
+    background-color: darkgray;
 }
 
-/* Add this style for the disease container */
 #diseasesContainer {
     text-align: left;
-    margin: 20px;
+    margin: 20px auto;
+    max-width: 60%;
 }
 
-/* .disease-column {
-    float: left;
-    width: 30%;
-    margin: 10px;
-} */
-
-/* Add this style for the results page link */
 #results-page a {
     display: block;
     text-align: center;
@@ -159,10 +168,3 @@ li {
 #results-page a:hover {
     color: #45a049;
 }
-
-/* .clickable-disease-name {
-    cursor: pointer;
-    color: blue;
-    
-    text-decoration: underline;
-} */
