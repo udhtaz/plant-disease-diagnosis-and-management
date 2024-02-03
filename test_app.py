@@ -1,51 +1,56 @@
 import unittest
 from app import app
+import time
 
 class AppTestCase(unittest.TestCase):
     def setUp(self):
-        # Set up a test client
         self.app = app.test_client()
 
     def tearDown(self):
-        # Clean up resources after testing
         pass
 
     def test_index_page(self):
-        # Test the index page
+        start_time = time.time()
         response = self.app.get('/')
+        end_time = time.time()
         self.assertEqual(response.status_code, 200)
         self.assertIn(b'Crop Disease Diagnosis and Management', response.data)
+        print("Test test_index_page took", end_time - start_time, "seconds")
 
     def test_plant_names_endpoint(self):
-        # Test the /plant_names endpoint
+        start_time = time.time()
         response = self.app.get('/plant_names')
+        end_time = time.time()
         self.assertEqual(response.status_code, 200)
         data = response.json
         self.assertIn('plant_names', data)
-        # Add more assertions to check the correctness of plant names data
+        print("Test test_plant_names_endpoint took", end_time - start_time, "seconds")
 
     def test_plant_symptoms_endpoint(self):
-        # Test the /plant_symptoms/<plant> endpoint
+        start_time = time.time()
         response = self.app.get('/plant_symptoms/beans')
+        end_time = time.time()
         self.assertEqual(response.status_code, 200)
         data = response.json
         self.assertIn('plant_symptoms', data)
-        # Add more assertions to check the correctness of symptoms for maize
+        print("Test test_plant_symptoms_endpoint took", end_time - start_time, "seconds")
 
     def test_match_diseases_endpoint(self):
-        # Test the /match_diseases endpoint
+        start_time = time.time()
         data = {'selected_symptoms': ['yellowing leaves', 'stunted growth']}
         response = self.app.post('/match_diseases', json=data)
+        end_time = time.time()
         self.assertEqual(response.status_code, 200)
         data = response.json
         self.assertIn('matched_diseases', data)
-        # Add more assertions to check the correctness of matched diseases data
+        print("Test test_match_diseases_endpoint took", end_time - start_time, "seconds")
 
     def test_save_excel_endpoint(self):
-        # Test the /save_excel endpoint
+        start_time = time.time()
         response = self.app.get('/save_excel')
+        end_time = time.time()
         self.assertEqual(response.status_code, 200)
-        # Add more assertions to check the correctness of generated Excel file
+        print("Test test_save_excel_endpoint took", end_time - start_time, "seconds")
 
 if __name__ == '__main__':
     unittest.main()
