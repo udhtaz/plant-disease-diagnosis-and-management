@@ -16,10 +16,7 @@ urls = {
     "oil palm": "https://plantvillage.psu.edu/topics/oil-palm/infos#diseases",
     "onion": "https://plantvillage.psu.edu/topics/onion/infos#diseases",
     "almond": "https://plantvillage.psu.edu/topics/almond/infos#diseases",
-    "banana": "https://plantvillage.psu.edu/topics/banana/infos#diseases",
     "carrot": "https://plantvillage.psu.edu/topics/carrot/infos#diseases",
-    "cassava": "https://plantvillage.psu.edu/topics/cassava-manioc/infos#diseases",
-    "cucumber": "https://plantvillage.psu.edu/topics/cucumber/infos#diseases",
     "ginger": "https://plantvillage.psu.edu/topics/ginger/infos#diseases",
     "orange": "https://plantvillage.psu.edu/topics/orange/infos#diseases",
     "pawpaw": "https://plantvillage.psu.edu/topics/papaya-pawpaw/infos#diseases",
@@ -55,7 +52,7 @@ def generate_excel():
 
         try:
             res = session.get(url)
-            res.raise_for_status()  # Raise HTTPError for bad requests
+            res.raise_for_status()
         except requests.exceptions.RequestException as e:
             print(f"Error: {e}. Skipping to the next plant.")
             continue
@@ -191,7 +188,6 @@ def match_diseases():
 
     # Iterate over each plant's DataFrame
     for plant, df in plant_dataframes.items():
-        # Iterate over each row in the DataFrame
         for index, row in df.iterrows():
             # Convert symptoms to string to handle potential floats
             symptoms = str(row['Symptoms'])
@@ -213,41 +209,43 @@ def match_diseases():
     return jsonify({'matched_diseases': matched_diseases})
 
 
-# Endpoint to match either symptom or disease
-@app.route('/match_selections', methods=['POST'])
-def match_selections():
+# Endpoint to match either symptom or disease for a selected plant
+@app.route('/match_selections/<plant>', methods=['POST'])
+def match_selections(plant):
     selected_symptoms = request.json.get('selected_symptoms', [])
     selected_diseases = request.json.get('selected_diseases', [])
 
     if not selected_symptoms and not selected_diseases:
         return jsonify({'error': 'No symptoms or diseases selected'}), 400
 
+    if plant not in plant_dataframes:
+        return jsonify({'error': f'Plant "{plant}" not found'}), 404
+
     matched_diseases = []
 
-    # Iterate over each plant's DataFrame
-    for plant, df in plant_dataframes.items():
-        # Iterate over each row in the DataFrame
-        for index, row in df.iterrows():
-            # Convert symptoms and diseases to strings to handle potential floats
-            symptoms = str(row['Symptoms'])
-            diseases = str(row['Disease Name'])
+    # Iterate over the selected plant's DataFrame
+    df = plant_dataframes[plant]
+    for index, row in df.iterrows():
+        symptoms = str(row['Symptoms'])
+        diseases = str(row['Disease Name'])
 
-            # Check if any selected symptom or disease matches with the symptoms or diseases of the plant
-            if any(symptom.lower() in symptoms.lower() for symptom in selected_symptoms) or \
-                    any(disease.lower() in diseases.lower() for disease in selected_diseases):
-                matched_disease = {
-                    'Disease Name': diseases,
-                    'Botanical Name': row['Botanical Name'],
-                    'Symptoms': symptoms,
-                    'Cause': row['Cause'],
-                    'Comments': row['Comments'],
-                    'Management': row['Management']
-                }
-                matched_diseases.append(matched_disease)
+        # Check if any selected symptom or disease matches with the symptoms or diseases of the plant
+        if any(symptom.lower() in symptoms.lower() for symptom in selected_symptoms) or \
+                any(disease.lower() in diseases.lower() for disease in selected_diseases):
+            matched_disease = {
+                'Affected Crop': plant,
+                'Disease Name': diseases,
+                'Botanical Name': row['Botanical Name'],
+                'Symptoms': symptoms,
+                'Cause': row['Cause'],
+                'Comments': row['Comments'],
+                'Management': row['Management']
+            }
+            matched_diseases.append(matched_disease)
 
     return jsonify({'matched_diseases': matched_diseases})
 
-# Add this route to your Flask application
+
 @app.route('/results')
 def results():
     return render_template('results.html')
